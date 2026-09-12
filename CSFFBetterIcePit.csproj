@@ -1,11 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <LangVersion>12.0</LangVersion>
-    <Nullable>disable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
     <AssemblyName>CSFFBetterIcePit</AssemblyName>
     <RootNamespace>CSFFBetterIcePit</RootNamespace>
+    <Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <PackageId>astralsnow.csff.bettericepit</PackageId>
+    <Authors>AstralSnow</Authors>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
     <GameDir>E:\SteamLibrary\steamapps\common\Card Survival Fantasy Forest</GameDir>
   </PropertyGroup>
 

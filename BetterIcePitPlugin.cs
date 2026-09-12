@@ -124,6 +124,13 @@ namespace CSFFBetterIcePit
             PassiveEffect effect = new PassiveEffect
             {
                 EffectName = PreservationEffectName,
+                Conditions = new GeneralCondition
+                {
+                    ReceivingRequiredDurabilityRanges = new DurabilitiesConditions
+                    {
+                        FuelRange = new Vector2(1f, 2f)
+                    }
+                },
                 SpoilageRateModifier = new OptionalFloatValue(true, 2f),
                 StatModifiers = Array.Empty<StatModifier>(),
                 NPCStatModifiers = Array.Empty<NPCStatPassiveModifierEffect>(),
