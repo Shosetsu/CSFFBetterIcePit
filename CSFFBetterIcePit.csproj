@@ -3,7 +3,7 @@
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>CSFFBetterIcePit</AssemblyName>
     <RootNamespace>CSFFBetterIcePit</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <LangVersion>latest</LangVersion>
     <PackageId>astralsnow.csff.bettericepit</PackageId>
     <Authors>AstralSnow</Authors>

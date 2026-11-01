@@ -12,14 +12,14 @@ namespace CSFFBetterIcePit
     {
         public const string PluginGuid = "astralsnow.csff.bettericepit";
         public const string PluginName = "CSFF Better Ice Pit";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.0.1";
 
         internal static ManualLogSource Log;
 
         private void Awake()
         {
             Log = Logger;
-            Logger.LogInfo(PluginName + " loaded; waiting for the game database.");
+            Logger.LogInfo(PluginName + " loaded; 等待游戏初始化");
         }
 
         private IEnumerator Start()
@@ -42,24 +42,16 @@ namespace CSFFBetterIcePit
         private const string IceBlockId = "IceBlock";
         private const string SnowPileId = "SnowPile";
         private const string PreservationEffectName = "冰窖阻止熔化";
-        private static bool applied;
 
         internal static void ApplyOnce(GameDataBase database)
         {
-            if (applied)
-                return;
-
             try
             {
                 Apply(database);
-                applied = true;
-                BetterIcePitPlugin.Log.LogInfo("Ice Pit definitions updated once: water limit=8100; IceBlock/SnowPile remote SpoilageTime bonus=+2.");
+                BetterIcePitPlugin.Log.LogInfo("已完成Patch处理");
             }
             catch (Exception exception)
             {
-                // This is intentionally a single attempt: continuously retrying after a
-                // game-data incompatibility would be more harmful than one clear error.
-                applied = true;
                 BetterIcePitPlugin.Log.LogError("Ice Pit definitions were not changed: " + exception);
             }
         }
@@ -69,13 +61,11 @@ namespace CSFFBetterIcePit
             CardData icePit = FindCard(database, IcePitId);
             CardData iceBlock = FindCard(database, IceBlockId);
             CardData snowPile = FindCard(database, SnowPileId);
-            if (icePit == null || iceBlock == null || snowPile == null)
-                throw new InvalidOperationException("Required CardData missing. Found: IcePit=" + (icePit != null) + ", IceBlock=" + (iceBlock != null) + ", SnowPile=" + (snowPile != null) + ".");
 
-            int coldEffectsChanged = SetColdEffectWaterLimit(icePit.PassiveEffects);
+            SetColdEffectWaterLimit(icePit.PassiveEffects);
+            BetterIcePitPlugin.Log.LogInfo("已修改冰窖有效上限");
             AddMeltingPreventionRemoteEffect(icePit, iceBlock, snowPile);
-
-            BetterIcePitPlugin.Log.LogInfo("Found CardData: " + icePit.name + ", " + iceBlock.name + ", " + snowPile.name + "; cold effects changed=" + coldEffectsChanged + ".");
+            BetterIcePitPlugin.Log.LogInfo("已添加阻止雪堆冰块熔化被动");
         }
 
         private static CardData FindCard(GameDataBase database, string name)
@@ -114,14 +104,14 @@ namespace CSFFBetterIcePit
 
         private static void AddMeltingPreventionRemoteEffect(CardData icePit, CardData iceBlock, CardData snowPile)
         {
-            List<RemotePassiveEffect> effects = new(icePit.RemotePassiveEffects ?? Array.Empty<RemotePassiveEffect>());
+            List<RemotePassiveEffect> effects = [.. icePit.RemotePassiveEffects ?? []];
             for (int i = 0; i < effects.Count; i++)
             {
                 if (effects[i].Effect.EffectName == PreservationEffectName)
                     return;
             }
 
-            PassiveEffect effect = new PassiveEffect
+            PassiveEffect effect = new()
             {
                 EffectName = PreservationEffectName,
                 Conditions = new GeneralCondition
@@ -132,23 +122,19 @@ namespace CSFFBetterIcePit
                     }
                 },
                 SpoilageRateModifier = new OptionalFloatValue(true, 2f),
-                StatModifiers = Array.Empty<StatModifier>(),
-                NPCStatModifiers = Array.Empty<NPCStatPassiveModifierEffect>(),
-                DroppedCards = Array.Empty<CardsDropCollection>(),
+                StatModifiers = [],
+                NPCStatModifiers = [],
+                DroppedCards = [],
                 GeneratedLiquid = new LiquidDrop(null, Vector2.zero, new TransferedDurabilities(), null, null)
             };
 
-            RemotePassiveEffect remote = new RemotePassiveEffect
+            RemotePassiveEffect remote = new()
             {
-                AppliesTo = new[]
-              {
-                  new CardOrTagRef { Target = iceBlock },
-                  new CardOrTagRef { Target = snowPile }
-              },
+                AppliesTo = [new CardOrTagRef { Target = iceBlock }, new CardOrTagRef { Target = snowPile }],
                 Effect = effect
             };
             effects.Add(remote);
-            icePit.RemotePassiveEffects = effects.ToArray();
+            icePit.RemotePassiveEffects = [.. effects];
         }
     }
 }
